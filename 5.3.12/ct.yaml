@@ -1,0 +1,17 @@
+# A configuration file for https://github.com/helm/chart-testing
+---
+# See https://github.com/helm/chart-testing#configuration
+remote: origin
+target-branch: main
+chart-dirs:
+  - .
+chart-repos:
+  - timescale=https://charts.timescale.com
+  - prometheus=https://prometheus-community.github.io/helm-charts
+  - open-telemetery=https://open-telemetry.github.io/opentelemetry-helm-charts
+# Some of tests require longer than default timeout
+helm-extra-args: --timeout 20m
+kubectl-timeout: 0s
+print-logs: false
+# FIXME(paulfantom): re-enable upgrade tests
+# upgrade: true

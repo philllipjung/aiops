@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: client
+
+server:
+  port: 8082
+
+otel:
+  exporter:
+    otlp:
+      protocol: grpc
+      endpoint: http://localhost:4317
+  resource:
+    attributes:
+      service.name: client-service
+      service: client-service
+      env: dev

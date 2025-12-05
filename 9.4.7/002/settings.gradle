@@ -1,0 +1,4 @@
+rootProject.name = 'Observability'
+include 'client'
+include 'server'
+

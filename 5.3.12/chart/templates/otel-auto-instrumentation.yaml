@@ -1,0 +1,26 @@
+{{ if (index .Values "opentelemetry-operator" "enabled") }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: {{ .Release.Name }}-auto-instrumentation
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,pre-delete
+    "helm.sh/hook-weight": "0"
+spec:
+  exporter:
+    endpoint: http://{{ .Release.Name }}-opentelemetry-collector.{{ .Release.Namespace }}.svc:4318
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  python:
+    image: {{ index .Values "opentelemetry-operator" "instrumentation" "pythonImage" }}
+  java:
+    image: {{ index .Values "opentelemetry-operator" "instrumentation" "javaImage" }}
+  nodejs:
+    image: {{ index .Values "opentelemetry-operator" "instrumentation" "nodejsImage" }}
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.25"
+{{- end -}}
+

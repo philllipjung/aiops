@@ -1,0 +1,3 @@
+artifactId=cloud-stream-source
+groupId=com.solace.samples.spring.scs
+version=0.0.3-SNAPSHOT

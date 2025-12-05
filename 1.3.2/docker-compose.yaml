@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  cortex:
+    env_file:
+      - './.env'
+    image: 'cortexproject/cortex:v1.13.0'
+    volumes:
+      - '${CORTEX_CONFIG_PATH_LOCAL}:${CORTEX_CONFIG_PATH}'
+    entrypoint:
+      - '/bin/cortex'
+      - '-config.file=${CORTEX_CONFIG_PATH}/${CORTEX_CONFIG_FILE}'
+    ports:
+      - '${CORTEX_PORT}:${CORTEX_PORT}'
+
+  grafana:
+    env_file:
+      - './.env'
+    image: 'grafana/grafana:latest'
+    volumes:
+      - '${GRAFANA_CONFIG_PATH_LOCAL}:${GRAFANA_CONFIG_PATH}'
+      - '${GRAFANA_DATASOURCES_PATH_LOCAL}:${GRAFANA_DATASOURCES_PATH}'
+      - '${GRAFANA_DASHBOARDS_PROVISIONING_PATH_LOCAL}:${GRAFANA_DASHBOARDS_PROVISIONING_PATH}'
+      - '${GRAFANA_DASHBOARDS_PATH_LOCAL}:${GRAFANA_DASHBOARDS_PATH}'
+      - '${GRAFANA_PLUGINS_PATH_LOCAL}:${GRAFANA_PLUGINS_PATH}'
+      - '${GRAFANA_PLUGINS_PROVISIONING_PATH_LOCAL}:${GRAFANA_PLUGINS_PROVISIONING_PATH}'
+    entrypoint:
+      - '${GRAFANA_HOME_PATH}/bin/grafana-server'
+      - '--homepath=${GRAFANA_HOME_PATH}'
+      - '--config=${GRAFANA_CONFIG_PATH}/${GRAFANA_CONFIG_FILE}'
+    ports:
+      - '${GRAFANA_PORT}:${GRAFANA_PORT}'
+
+  loki:
+    env_file:
+      - './.env'
+    image: 'grafana/loki:latest'
+    command: '-config.file=${LOKI_CONFIG_PATH}/${LOKI_CONFIG_FILE}'
+    ports:
+      - '${LOKI_PORT}:${LOKI_PORT}'
+
+  tempo:
+    env_file:
+      - './.env'
+    image: 'grafana/tempo:2.0.0'
+    volumes:
+      - '${TEMPO_CONFIG_PATH_LOCAL}:${TEMPO_CONFIG_PATH}'
+    command:
+      - '-config.file=${TEMPO_CONFIG_PATH}/${TEMPO_CONFIG_FILE}'
+      - '-config.expand-env=true'
+    ports:
+      - '${TEMPO_PORT}:${TEMPO_PORT}'
+
+  agent:
+    env_file:
+      - './.env'
+    image: 'grafana/agent:main'
+    volumes:
+      - '${AGENT_CONFIG_PATH_LOCAL}:${AGENT_CONFIG_PATH}'
+      - 'demo_demo_logs:${AGENT_LOGS_PATH}'
+    entrypoint:
+      - '/bin/agent'
+      - '-config.file=${AGENT_CONFIG_PATH}/${AGENT_CONFIG_FILE}'
+      - '-config.expand-env'
+      - '-config.enable-read-api'
+      - '-enable-features=integrations-next'
+    ports:
+      - '${AGENT_PORT}:${AGENT_PORT}'
+      - '${AGENT_PORT_APP_RECEIVER}:${AGENT_PORT_APP_RECEIVER}'
+      - '${TEMPO_PORT_OTLP_RECEIVER}:${TEMPO_PORT_OTLP_RECEIVER}'
+    depends_on:
+      - 'cortex'
+      - 'grafana'
+      - 'loki'
+      - 'tempo'
+
+  database:
+    env_file:
+      - './.env'
+    image: 'postgres:latest'
+    volumes:
+      - 'db_data:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_USER: '${DATABASE_USER}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
+      POSTGRES_DB: '${DATABASE_NAME}'
+    ports:
+      - '${DATABASE_PORT}:${DATABASE_PORT}'
+
+  demo:
+    env_file:
+      - './.env'
+    profiles:
+      - 'demo'
+    volumes:
+      - './${DEMO_DEMO_PATH}:${DEMO_WORKSPACE_PATH}/${DEMO_DEMO_PATH}'
+      - './${DEMO_PACKAGES_PATH}:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_PATH}'
+      - 'demo_build_cache:${DEMO_WORKSPACE_PATH}/.cache'
+      - 'demo_node_modules:${DEMO_WORKSPACE_PATH}/node_modules'
+      - 'demo_demo_dist:${DEMO_WORKSPACE_PATH}/${DEMO_DEMO_PATH}/dist'
+      - 'demo_demo_logs:${DEMO_WORKSPACE_PATH}/${DEMO_DEMO_PATH}/${DEMO_SERVER_LOGS_PATH}'
+      - 'demo_demo_node_modules:${DEMO_WORKSPACE_PATH}/${DEMO_DEMO_PATH}/node_modules'
+      - 'demo_core_dist:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_CORE_PATH}/dist'
+      - 'demo_core_node_modules:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_CORE_PATH}/node_modules'
+      - 'demo_react_dist:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_REACT_PATH}/dist'
+      - 'demo_react_node_modules:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_REACT_PATH}/node_modules'
+      - 'demo_web_sdk_dist:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_WEB_SDK_PATH}/dist'
+      - 'demo_web_sdk_node_modules:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_WEB_SDK_PATH}/node_modules'
+      - 'demo_web_tracing_dist:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_WEB_TRACING_PATH}/dist'
+      - 'demo_web_tracing_node_modules:${DEMO_WORKSPACE_PATH}/${DEMO_PACKAGES_WEB_TRACING_PATH}/node_modules'
+    build:
+      context: '.'
+      args:
+        DEMO_WORKSPACE_PATH: '${DEMO_WORKSPACE_PATH}'
+        DEMO_DEMO_PATH: '${DEMO_DEMO_PATH}'
+        DEMO_PACKAGES_CORE_PATH: '${DEMO_PACKAGES_CORE_PATH}'
+        DEMO_PACKAGES_PATH: '${DEMO_PACKAGES_PATH}'
+        DEMO_PACKAGES_REACT_PATH: '${DEMO_PACKAGES_REACT_PATH}'
+        DEMO_PACKAGES_WEB_SDK_PATH: '${DEMO_PACKAGES_WEB_SDK_PATH}'
+        DEMO_PACKAGES_WEB_TRACING_PATH: '${DEMO_PACKAGES_WEB_TRACING_PATH}'
+        DEMO_PORT: '${DEMO_PORT}'
+        DEMO_PORT_HMR: '${DEMO_PORT_HMR}'
+    ports:
+      - '${DEMO_PORT}:${DEMO_PORT}'
+      - '${DEMO_PORT_HMR}:${DEMO_PORT_HMR}'
+    depends_on:
+      - 'agent'
+      - 'database'
+
+volumes:
+  db_data:
+  demo_build_cache:
+  demo_node_modules:
+  demo_demo_dist:
+  demo_demo_logs:
+    driver: 'local'
+    driver_opts:
+      type: 'none'
+      device: '${PWD}/${DEMO_DEMO_PATH}/${DEMO_SERVER_LOGS_PATH}'
+      o: 'bind'
+  demo_demo_node_modules:
+  demo_core_dist:
+  demo_core_node_modules:
+  demo_react_dist:
+  demo_react_node_modules:
+  demo_web_sdk_dist:
+  demo_web_sdk_node_modules:
+  demo_web_tracing_dist:
+  demo_web_tracing_node_modules:

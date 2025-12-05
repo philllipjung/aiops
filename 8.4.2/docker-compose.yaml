@@ -1,0 +1,470 @@
+version: '3.0'
+
+services:
+  timescaledb:
+    # TODO change to 15 when the new HA image is available
+    image: timescale/timescaledb-ha:pg14-latest
+    restart: on-failure
+    ports:
+      - 5432:5432/tcp
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: tsdb
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: on-failure
+    depends_on:
+     - promscale
+    ports:
+      - 9090:9090/tcp
+    volumes:
+      - ${PWD}/../prometheus.yml:/etc/prometheus/prometheus.yml
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    restart: on-failure
+    ports:
+      - 9093:9093/tcp
+
+  promscale:
+    image: timescale/promscale:latest
+    restart: on-failure
+    ports:
+      - 9201:9201/tcp
+      - 9202:9202/tcp
+    depends_on:
+      - timescaledb
+    volumes:
+      - ${PWD}/../promscale_prometheus.yml:/prometheus.yml
+      - ${PWD}/../rules.yml:/rules.yml
+      - ${PWD}/../alerts.yml:/alerts.yml
+    environment:
+      PROMSCALE_DB_URI: postgres://postgres:password@timescaledb:5432/tsdb?sslmode=allow
+      PROMSCALE_METRICS_RULES_CONFIG_FILE: /prometheus.yml
+      PROMSCALE_PKG: "docker-quick-start"
+
+  otelcol:
+    image: "otel/opentelemetry-collector-contrib:0.63.1"
+    container_name: otel-col
+    restart: on-failure
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    depends_on:
+      - promscale
+    ports:
+      - 14268:14268/tcp # jaeger http
+      - 4317:4317/tcp
+      - 4318:4318/tcp
+    volumes:
+      - ${PWD}/../otel-collector-config.yml:/etc/otel-collector-config.yml
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:1.39.0
+    restart: on-failure
+    environment:
+      SPAN_STORAGE_TYPE: grpc-plugin
+      METRICS_STORAGE_TYPE: prometheus
+      GRPC_STORAGE_SERVER: promscale:9202
+      PROMETHEUS_SERVER_URL: "http://promscale:9201"
+
+    depends_on:
+    - timescaledb
+    - promscale
+    ports:
+      - "16686:16686"
+
+  grafana:
+    image: timescale/promscale-demo-grafana
+    restart: on-failure
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - 3000:3000/tcp
+    depends_on:
+      - timescaledb
+      - jaeger-all-in-one
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter
+    restart: on-failure
+    ports:
+      - "9100:9100"
+
+  adservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-adservice
+    container_name: ad-service
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    restart: always
+    ports:
+      - "${AD_SERVICE_PORT}"
+    environment:
+      - AD_SERVICE_PORT
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+      - OTEL_SERVICE_NAME=adservice
+    depends_on:
+      - otelcol
+
+
+  # Cart service
+  cartservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-cartservice
+    container_name: cart-service
+    deploy:
+      resources:
+        limits:
+          memory: 160M
+    restart: always
+    ports:
+      - "${CART_SERVICE_PORT}"
+    environment:
+      - CART_SERVICE_PORT
+      - REDIS_ADDR
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_SERVICE_NAME=cartservice
+      - ASPNETCORE_URLS=http://*:${CART_SERVICE_PORT}
+    depends_on:
+      - redis-cart
+      - otelcol
+
+
+  # Checkout service
+  checkoutservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-checkoutservice
+    container_name: checkout-service
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    restart: always
+    ports:
+      - "${CHECKOUT_SERVICE_PORT}"
+    environment:
+      - CHECKOUT_SERVICE_PORT
+      - CART_SERVICE_ADDR
+      - CURRENCY_SERVICE_ADDR
+      - EMAIL_SERVICE_ADDR
+      - PAYMENT_SERVICE_ADDR
+      - PRODUCT_CATALOG_SERVICE_ADDR
+      - SHIPPING_SERVICE_ADDR
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+      - OTEL_SERVICE_NAME=checkoutservice
+    depends_on:
+      - cartservice
+      - currencyservice
+      - emailservice
+      - paymentservice
+      - productcatalogservice
+      - shippingservice
+      - otelcol
+
+
+  # Currency service
+  currencyservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-currencyservice
+    container_name: currency-service
+    deploy:
+      resources:
+        limits:        
+          memory: 20M
+    restart: always
+    ports:
+      - "${CURRENCY_SERVICE_PORT}"
+    environment:
+      - CURRENCY_SERVICE_PORT
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=currencyservice   # The C++ SDK does not support OTEL_SERVICE_NAME
+    depends_on:
+      - otelcol
+
+
+  # Email service
+  emailservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-emailservice
+    container_name: email-service
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    restart: always
+    ports:
+      - "${EMAIL_SERVICE_PORT}"
+    environment:
+      - APP_ENV=production
+      - EMAIL_SERVICE_PORT
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otelcol:4318/v1/traces
+      - OTEL_SERVICE_NAME=emailservice
+    depends_on:
+      - otelcol
+
+
+  # Frontend
+  frontend:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-frontend
+    container_name: frontend
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: always
+    ports:
+      - "${FRONTEND_PORT}"
+    environment:
+      - PORT=${FRONTEND_PORT}
+      - FRONTEND_ADDR
+      - AD_SERVICE_ADDR
+      - CART_SERVICE_ADDR
+      - CHECKOUT_SERVICE_ADDR
+      - CURRENCY_SERVICE_ADDR
+      - PRODUCT_CATALOG_SERVICE_ADDR
+      - RECOMMENDATION_SERVICE_ADDR
+      - SHIPPING_SERVICE_ADDR
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=frontend
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - ENV_PLATFORM
+      - OTEL_SERVICE_NAME=frontend
+      - PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+    depends_on:
+      - adservice
+      - cartservice
+      - checkoutservice
+      - currencyservice
+      - otelcol
+      - productcatalogservice
+      - quoteservice
+      - recommendationservice
+      - shippingservice
+
+
+  frontendproxy:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-frontendproxy
+    container_name: frontend-proxy
+    ports:
+      - "${ENVOY_PORT}:${ENVOY_PORT}"
+      - 10000:10000
+    environment:
+      - PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - FRONTEND_PORT
+      - FRONTEND_HOST
+      - FEATURE_FLAG_SERVICE_PORT
+      - FEATURE_FLAG_SERVICE_HOST
+      - LOCUST_WEB_HOST
+      - LOCUST_WEB_PORT
+      - GRAFANA_SERVICE_PORT
+      - GRAFANA_SERVICE_HOST
+      - JAEGER_SERVICE_PORT
+      - JAEGER_SERVICE_HOST
+      - ENVOY_PORT
+      - ENVOY_UID=0
+    depends_on:
+      - frontend
+      - featureflagservice
+      - loadgenerator
+      - grafana
+
+  loadgenerator:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-loadgenerator
+    container_name: load-generator
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+    restart: always
+    ports:
+      - "${LOCUST_WEB_PORT}"
+    environment:
+      - LOCUST_WEB_PORT
+      - LOCUST_USERS
+      - LOCUST_HOST
+      - LOCUST_HEADLESS
+      - LOCUST_AUTOSTART
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_SERVICE_NAME=loadgenerator
+      - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+    depends_on:
+      - frontend
+
+
+  # Payment service
+  paymentservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-paymentservice
+    container_name: payment-service
+    deploy:
+      resources:
+        limits:
+          memory: 70M
+    restart: always
+    ports:
+      - "${PAYMENT_SERVICE_PORT}"
+    environment:
+      - PAYMENT_SERVICE_PORT
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_SERVICE_NAME=paymentservice
+    depends_on:
+      - otelcol
+
+
+  # Product Catalog service
+  productcatalogservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-productcatalogservice
+    container_name: product-catalog-service
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    restart: always
+    ports:
+      - "${PRODUCT_CATALOG_SERVICE_PORT}"
+    environment:
+      - PRODUCT_CATALOG_SERVICE_PORT
+      - FEATURE_FLAG_GRPC_SERVICE_ADDR
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_SERVICE_NAME=productcatalogservice
+    depends_on:
+      - otelcol
+
+
+  # Quote service
+  quoteservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-quoteservice
+    container_name: quoteservice
+    deploy:
+      resources:
+        limits:
+          memory: 30M
+    restart: always
+    ports:
+      - "${QUOTE_SERVICE_PORT}"
+    environment:
+      # OTEL_EXPORTER_OTLP_TRACES_ENDPOINT # Not working for PHP
+      - QUOTE_SERVICE_PORT
+      - OTEL_SERVICE_NAME=quoteservice
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4318
+      - OTEL_TRACES_SAMPLER=parentbased_always_on
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf
+      - OTEL_PHP_TRACES_PROCESSOR=simple
+    depends_on:
+      - otelcol
+
+
+  # Recommendation service
+  recommendationservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-recommendationservice
+    container_name: recommendation-service
+    deploy:
+      resources:
+        limits:
+          memory: 500M               # This is high to enable supporting the recommendationCache feature flag use case
+    restart: always
+    ports:
+      - "${RECOMMENDATION_SERVICE_PORT}"
+    environment:
+      - RECOMMENDATION_SERVICE_PORT
+      - PRODUCT_CATALOG_SERVICE_ADDR
+      - FEATURE_FLAG_GRPC_SERVICE_ADDR
+      - OTEL_PYTHON_LOG_CORRELATION=true
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+      - OTEL_SERVICE_NAME=recommendationservice
+      - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+    depends_on:
+      - productcatalogservice
+      - otelcol
+      - featureflagservice
+
+
+  # Shipping service
+  shippingservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-shippingservice
+    container_name: shipping-service
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    restart: always
+    ports:
+      - "${SHIPPING_SERVICE_PORT}"
+    environment:
+      - SHIPPING_SERVICE_PORT
+      - QUOTE_SERVICE_ADDR
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_SERVICE_NAME=shippingservice
+    depends_on:
+      - otelcol
+
+
+  # Feature Flag service
+  featureflagservice:
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}-featureflagservice
+    container_name: feature-flag-service
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: always
+    ports:
+      - "${FEATURE_FLAG_SERVICE_PORT}"     # Feature Flag Service UI
+      - "${FEATURE_FLAG_GRPC_SERVICE_PORT}"                             # Feature Flag Service gRPC API
+    environment:
+      - FEATURE_FLAG_SERVICE_PORT
+      - FEATURE_FLAG_GRPC_SERVICE_PORT
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=featureflagservice
+      - DATABASE_URL=ecto://ffs:ffs@ffs_postgres:5432/ffs
+      - FEATURE_FLAG_SERVICE_PATH_ROOT="/feature"
+    depends_on:
+      ffs_postgres:
+        condition: service_healthy
+
+
+
+  # Postgres used by Feature Flag service
+  ffs_postgres:
+    image: cimg/postgres:14.2
+    container_name: postgres
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+    restart: always
+    environment:
+      - POSTGRES_USER=ffs
+      - POSTGRES_DB=ffs
+      - POSTGRES_PASSWORD=ffs
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ffs -U ffs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+  redis-cart:
+    image: redis:alpine
+    container_name: redis-cart
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    restart: always
+    ports:
+      - "${REDIS_PORT}"
+
+volumes:
+  timescaledb-data:
+  grafana-data:
