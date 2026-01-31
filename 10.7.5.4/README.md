@@ -1,32 +1,32 @@
-# AIOps Agent
+# MCP Server
 
 ## 버전
 **v10.7.5.4**
 
 ## 개요
 
-AIOps Agent v10.7.5.4는 OpenSearch 통합 로그 수집 에이전트입니다.
+MCP (Model Context Protocol) 서버 설정입니다.
 
-## v10.7.5.4 변경사항
+## 프로젝트 구조
 
-- 성능 최적화
-- 버퍼 관리 개선
+```
+10.7.5.4/
+├── compose.yaml      # Docker Compose 설정
+├── data/             # 데이터 디렉토리
+├── docker/           # Docker 설정
+└── codecov.yml       # Codecov 설정
+```
 
-## 설치
+## 실행
 
 ```bash
 cd /root/aiops/10.7.5.4
+
+# 시작
 docker-compose up -d
-```
 
-## 사용
-
-```bash
-# 로그 확인
-docker-compose logs -f
-
-# 상태 확인
-docker-compose ps
+# 중지
+docker-compose down
 ```
 
 ## 관련 링크

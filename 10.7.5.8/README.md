@@ -1,23 +1,20 @@
-# AIOps Agent
+# MCP Documentation
 
 ## 버전
 **v10.7.5.8**
 
 ## 개요
 
-AIOps Agent v10.7.5.8는 최신 버전의 에이전트입니다.
+MCP (Model Context Protocol) 문서 및 예제입니다.
 
-## v10.7.5.8 변경사항
+## 프로젝트 구조
 
-- 최신 Fluent Bit 통합
-- 보안 강화
-- 모니터링 기능 추가
-
-## 설치
-
-```bash
-cd /root/aiops/10.7.5.8
-docker-compose up -d
+```
+10.7.5.8/
+├── 01/    # 섹션 1
+├── 02/    # 섹션 2
+├── 03/    # 섹션 3
+└── README.md
 ```
 
 ## 관련 링크

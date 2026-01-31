@@ -1,24 +1,44 @@
-# E2E Tests
+# Spring Boot Distributed Tracing
 
 ## 버전
 **v3.7.2**
 
 ## 개요
 
-Faro Web SDK의 E2E 테스트 스위트 v3.7.2입니다.
+Spring Boot 3와 OpenTelemetry, Jaeger를 사용한 분산 추적 예제입니다.
 
-## 변경사항
+## 기술 스택
 
-- 테스트 커버리지 확장
-- 테스트 안정성 개선
+- **Java**
+- **Spring Boot 3**
+- **OpenTelemetry** Java
+- **Jaeger** Tracing
 
-## 실행 방법
+## 프로젝트 구조
+
+```
+3.7.2/
+├── pom.xml          # Maven 설정
+└── src/             # 소스 코드
+```
+
+## 빌드 및 실행
 
 ```bash
 cd /root/aiops/3.7.2
-yarn install
-yarn cypress
+
+# 빌드
+mvn clean install
+
+# 실행
+java -jar target/distributed-service.jar
 ```
+
+## 주요 기능
+
+- Spring Boot 3 통합
+- OpenTelemetry 자동 계측
+- Jaeger 추적 시각화
 
 ## 관련 링크
 

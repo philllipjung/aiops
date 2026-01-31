@@ -1,23 +1,32 @@
-# AIOps Component
+# Kubernetes Deployment
 
 ## 버전
 **v10.3.2.2**
 
 ## 개요
 
-AIOps 컴포넌트 v10.3.2.2는 로그 수집 및 분석을 위한 모듈입니다.
+Kubernetes 배포 매니페스트입니다.
 
-## 기능
+## 프로젝트 구조
 
-- 로그 수집
-- 메트릭 집계
-- 이벤트 처리
+```
+10.3.2.2/
+├── deployment.yaml      # Deployment 설정
+├── monitor.yaml        # 모니터링 설정
+├── prometheus-adapter  # Prometheus 어댑터
+└── service.yaml        # Service 설정
+```
 
-## 설치
+## 사용
 
 ```bash
 cd /root/aiops/10.3.2.2
-yarn install
+
+# 배포
+kubectl apply -f .
+
+# 확인
+kubectl get all
 ```
 
 ## 관련 링크

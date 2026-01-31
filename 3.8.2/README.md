@@ -1,33 +1,37 @@
-# Faro Web SDK
+# OpenTelemetry Java Custom Instrumentation
 
 ## 버전
 **v3.8.2**
 
 ## 개요
 
-Faro Web SDK v3.8.2는 패치 버전으로 버그 수정과 개선이 포함되어 있습니다.
+OpenTelemetry Java 커스텀 계측 예제입니다. Docker 컨테이너로 실행됩니다.
 
-## 변경사항
+## Dockerfile
 
-- 버그 수정
-- 타입 정의 개선
+```dockerfile
+FROM maven:3.8.7-openjdk-18 as build
+COPY simple-java /home/app/simple-java
+COPY opentelemetry-custom-instrumentation /home/app/opentelemetry-custom-instrumentation
+```
 
-## 설치
+## 빌드 및 실행
 
 ```bash
-npm install @grafana/faro-web-sdk@3.8.2
+cd /root/aiops/3.8.2
+
+# Docker 이미지 빌드
+docker build -t otel-java-instr .
+
+# 실행
+docker run otel-java-instr
 ```
 
-## 사용
+## 주요 기능
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
-
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
-```
+- OpenTelemetry Java Agent
+- 커스텀 계측
+- Docker 컨테이너화
 
 ## 관련 링크
 

@@ -1,30 +1,38 @@
-# Transport XHR Instrumentation
+# Python Microservices Demo
 
 ## 버전
 **v3.4.3**
 
 ## 개요
 
-Transport XHR Instrumentation v3.4.3는 XMLHttpRequest 계측 플러그인입니다.
+OpenTelemetry을 사용한 Python 마이크로서비스 예제입니다. 서비스 간 통신과 추적을 보여줍니다.
 
-## 변경사항
+## 프로젝트 구조
 
-- 성능 최적화
-- 에러 처리 개선
+```
+3.4.3/
+├── __init__.py
+├── service1.py      # 서비스 1
+└── service2.py      # 서비스 2
+```
 
-## 설치
+## 실행
 
 ```bash
-npm install @grafana/transport-xhr-instr@3.4.3
+cd /root/aiops/3.4.3
+
+# 서비스 1 실행
+python service1.py
+
+# 서비스 2 실행
+python service2.py
 ```
 
-## 사용
+## 주요 기능
 
-```typescript
-import { XhrInstrumentation } from '@grafana/transport-xhr-instr';
-
-const xhrInstr = new XhrInstrumentation();
-```
+- Python 마이크로서비스
+- OpenTelemetry 추적
+- 서비스 간 통신
 
 ## 관련 링크
 

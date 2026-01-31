@@ -1,30 +1,36 @@
-# Console Instrumentation
+# Jaeger Python Example
 
 ## 버전
 **v4.2.9**
 
 ## 개요
 
-Console Instrumentation v4.2.9는 콘솔 로그 수집 플러그인의 안정화 버전입니다.
+Jaeger 분산 추적 시스템을 사용한 Python 예제입니다.
 
-## 변경사항
+## 코드 구조
 
-- 안정성 강화
-- 메모리 최적화
+```python
+# jaeger_example.py
+from jaeger_client import JaegerClient
 
-## 설치
+# Jaeger 추적 설정
+client = JaegerClient()
+```
+
+## 실행
 
 ```bash
-npm install @grafana/console-instr@4.2.9
+cd /root/aiops/4.2.9
+
+# 실행
+python jaeger_example.py
 ```
 
-## 사용
+## 주요 기능
 
-```typescript
-import { ConsoleInstrumentation } from '@grafana/console-instr';
-
-const consoleInstr = new ConsoleInstrumentation();
-```
+- Jaeger 추적
+- Span 생성
+- 추적 데이터 전송
 
 ## 관련 링크
 

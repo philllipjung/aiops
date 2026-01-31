@@ -1,33 +1,32 @@
-# Faro Web SDK
+# Helm Chart
 
 ## 버전
 **v5.3.12**
 
 ## 개요
 
-Faro Web SDK v5.3.12는 웹 observability SDK의 마이너 업데이트 버전입니다.
+Kubernetes Helm Chart 프로젝트입니다.
 
-## v5.3.12 변경사항
+## 프로젝트 구조
 
-- 새로운 인스트루먼테이션 추가
-- 성능 최적화
-- 버그 수정
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@5.3.12
+```
+5.3.12/
+├── Makefile          # 빌드 설정
+├── ct.yaml           # Chart Testing 설정
+├── chart/            # Helm Chart
+└── docs/             # 문서
 ```
 
 ## 사용
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/5.3.12
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
+# Lint
+make lint
+
+# 테스트
+ct install
 ```
 
 ## 관련 링크

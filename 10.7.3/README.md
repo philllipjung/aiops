@@ -1,23 +1,19 @@
-# AIOps Agent
+# RAG Documentation
 
 ## 버전
 **v10.7.3**
 
 ## 개요
 
-AIOps Agent v10.7.3는 OpenSearch와 통합된 로그/메트릭 수집 에이전트입니다.
+RAG (Retrieval Augmented Generation) 관련 문서와 도구입니다.
 
-## 기능
+## 프로젝트 구조
 
-- Fluent Bit 기반 로그 수집
-- OpenSearch 데이터 전송
-- Docker 지원
-
-## 설치
-
-```bash
-cd /root/aiops/10.7.3
-docker-compose up -d
+```
+10.7.3/
+├── README.md
+├── retrieval_augemented_generation.md    # RAG 가이드
+└── tools.md                               # 도구 설명
 ```
 
 ## 관련 링크

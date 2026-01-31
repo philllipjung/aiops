@@ -1,34 +1,38 @@
-# Faro Web SDK
+# ByteBuddy Java Agent
 
 ## 버전
 **v3.8.1**
 
 ## 개요
 
-Faro Web SDK v3.8.1은 웹 observability SDK의 안정화 버전입니다.
+ByteBuddy Java 바이트코드 조작 라이브러리 예제입니다.
+
+## 주요 파일
+
+```
+3.8.1/
+├── ByteBuddy/                    # 바이트코드 생성
+├── ByteBuddyExampleMain.java    # 메인 예제
+└── Robot.java                   # Robot 예제
+```
+
+## 실행
+
+```bash
+cd /root/aiops/3.8.1
+
+# 컴파일
+javac *.java
+
+# 실행
+java ByteBuddyExampleMain
+```
 
 ## 주요 기능
 
-- 오류 추적
-- 성능 모니터링
-- 사용자 세션 추적
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@3.8.1
-```
-
-## 사용
-
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
-
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
-```
+- Java 바이트코드 생성
+- 런타임 코드 조작
+- Agent 개발
 
 ## 관련 링크
 

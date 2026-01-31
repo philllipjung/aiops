@@ -1,23 +1,32 @@
-# E2E Tests
+# Gradle Java Project
 
 ## 버전
 **v3.7.4**
 
 ## 개요
 
-Faro Web SDK의 E2E 테스트 스위트 v3.7.4입니다.
+Gradle 기반 Java 프로젝트입니다.
 
-## 변경사항
+## 프로젝트 구조
 
-- 새로운 테스트 케이스 추가
-- Cypress 버전 업데이트
+```
+3.7.4/
+├── build.gradle.kts  # Gradle 설정 (Kotlin DSL)
+├── gradle            # Gradle Wrapper
+├── gradlew           # Gradle Wrapper (Unix)
+└── build/            # 빌드 출력
+```
 
-## 실행 방법
+## 빌드
 
 ```bash
 cd /root/aiops/3.7.4
-yarn install
-yarn cypress
+
+# 빌드
+./gradlew build
+
+# Clean
+./gradlew clean
 ```
 
 ## 관련 링크

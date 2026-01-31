@@ -1,30 +1,38 @@
-# Console Instrumentation
+# Python Message Tracing
 
 ## 버전
 **v4.2.5**
 
 ## 개요
 
-Console Instrumentation v4.2.5는 브라우저 콘솔 로그 수집 플러그인의 패치 버전입니다.
+OpenTelemetry을 사용한 메시지 추적 예제입니다. Producer/Consumer 패턴과 추적을 보여줍니다.
 
-## 변경사항
+## 프로젝트 구조
 
-- 버그 수정
-- 성능 개선
+```
+4.2.5/
+├── consumer.py      # 메시지 소비자
+├── producer.py      # 메시지 생산자
+└── tracing.py       # 추적 유틸리티
+```
 
-## 설치
+## 실행
 
 ```bash
-npm install @grafana/console-instr@4.2.5
+cd /root/aiops/4.2.5
+
+# Producer 실행
+python producer.py
+
+# Consumer 실행 (다른 터미널)
+python consumer.py
 ```
 
-## 사용
+## 주요 기능
 
-```typescript
-import { ConsoleInstrumentation } from '@grafana/console-instr';
-
-const consoleInstr = new ConsoleInstrumentation();
-```
+- 메시지 Producer/Consumer 패턴
+- OpenTelemetry 추적
+- 분산 시스템 계측
 
 ## 관련 링크
 

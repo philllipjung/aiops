@@ -1,22 +1,27 @@
-# AIOps Agent
+# Python MCP Application
 
 ## 버전
 **v10.7.5.5**
 
 ## 개요
 
-AIOps Agent v10.7.5.5는 로그 수집 에이전트의 안정화 버전입니다.
+Python 기반 MCP (Model Context Protocol) 애플리케이션입니다.
 
-## v10.7.5.5 변경사항
+## 프로젝트 구조
 
-- 안정성 강화
-- 에러 처리 개선
+```
+10.7.5.5/
+├── configuration.py    # 설정 파일
+└── task_maistro.py    # 메인 애플리케이션
+```
 
-## 설치
+## 실행
 
 ```bash
 cd /root/aiops/10.7.5.5
-docker-compose up -d
+
+# 실행
+python task_maistro.py
 ```
 
 ## 관련 링크

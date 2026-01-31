@@ -1,25 +1,27 @@
-# E2E Tests
+# Spring Boot Service
 
 ## 버전
 **v3.7.1**
 
 ## 개요
 
-Faro Web SDK의 End-to-End 테스트 스위트 v3.7.1입니다. Cypress를 사용한 통합 테스트를 포함합니다.
+Spring Boot 기반 분산 서비스 예제입니다.
 
-## 테스트 항목
+## 프로젝트 구조
 
-- SDK 초기화
-- 이벤트 전송
-- 에러 추적
-- 세션 관리
+```
+3.7.1/
+├── samples/    # 예제 코드
+└── src/        # 소스 코드
+```
 
-## 실행 방법
+## 빌드
 
 ```bash
 cd /root/aiops/3.7.1
-yarn install
-yarn cypress
+
+# 빌드
+./gradlew build
 ```
 
 ## 관련 링크

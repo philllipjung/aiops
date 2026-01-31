@@ -1,29 +1,36 @@
-# Faro Component
+# Hotrod Go Application
 
 ## 버전
 **v3.3.1**
 
 ## 개요
 
-Faro Web SDK의 컴포넌트 패키지입니다. SDK의 모듈화된 부품을 포함합니다.
+Pyroscope Hotrod Golang 예제 애플리케이션입니다. Docker 기반 데모 애플리케이션을 포함합니다.
 
-## 기능
+## 기술 스택
 
-- 모듈화된 컴포넌트 구조
-- 재사용 가능한 빌딩 블록
-- 타입 안전성
+- **Go**
+- **Docker**
+- **Make** 빌드 시스템
 
-## 설치
+## 프로젝트 구조
+
+```
+3.3.1/
+├── Makefile        # 빌드 설정
+└── demo-app/       # 데모 애플리케이션
+```
+
+## 빌드 및 실행
 
 ```bash
 cd /root/aiops/3.3.1
-yarn install
-```
 
-## 사용
+# 빌드
+make build
 
-```typescript
-import { Component } from '@grafano/component';
+# 실행
+docker run -p 8080:8080 demo-app
 ```
 
 ## 관련 링크

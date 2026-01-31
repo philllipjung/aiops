@@ -1,33 +1,20 @@
-# Faro Web SDK
+# Kubernetes Configuration
 
 ## 버전
 **v5.3.13**
 
 ## 개요
 
-Faro Web SDK v5.3.13은 패치 버전으로 버그 수정과 안정성 개선이 포함되어 있습니다.
+Kubernetes 매니페스트와 설정 파일을 포함합니다.
 
-## v5.3.13 변경사항
+## 프로젝트 구조
 
-- 중요 버그 수정
-- 안정성 강화
-- 문서 개선
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@5.3.13
 ```
-
-## 사용
-
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
-
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
+5.3.13/
+├── README.md
+├── deployment/       # 배포 설정
+├── service/          # 서비스 설정
+└── configmap/        # ConfigMap 설정
 ```
 
 ## 관련 링크
