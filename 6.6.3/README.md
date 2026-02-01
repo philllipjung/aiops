@@ -1,35 +1,32 @@
-# Faro Web SDK
+# Kubernetes Helm Setup
 
 ## 버전
 **v6.6.3**
 
 ## 개요
 
-Faro Web SDK v6.6.3는 OpenTelemetry 지원 및 고급 tracing 기능을 포함한 SDK입니다.
+Kubernetes와 Helm을 사용한 클러스터 설정 프로젝트입니다.
 
-## v6.6.x 기능
+## 프로젝트 구조
 
-- OpenTelemetry 호환
-- 고급 tracing
-- 메트릭 수집
-- 성능 개선
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@6.6.3
+```
+6.6.3/
+├── helm/                # Helm Charts
+├── kind-config.yaml     # Kind 클러스터 설정
+├── manifests/           # Kubernetes 매니페스트
+└── screenshots/         # 스크샷샷
 ```
 
 ## 사용
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/6.6.3
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-  experimentalFeatures: { opentelemetry: true },
-});
+# Helm 차트 설치
+helm install release ./helm
+
+# 매니페스트 적용
+kubectl apply -f manifests/
 ```
 
 ## 관련 링크

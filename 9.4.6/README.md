@@ -1,33 +1,30 @@
-# Faro Web SDK
+# Maven Java Project
 
 ## 버전
 **v9.4.6**
 
 ## 개요
 
-Faro Web SDK v9.4.6는 마이너 버전 업그레이드로 새로운 기능이 추가되었습니다.
+Maven 기반 Java 프로젝트입니다.
 
-## v9.4.6 새로운 기능
+## 프로젝트 구조
 
-- 향상된 AI 분석
-- 개선된 Session Replay
-- 새로운 통합 옵션
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@9.4.6
+```
+9.4.6/
+├── pom.xml          # Maven 설정
+└── src/             # 소스 코드
 ```
 
-## 사용
+## 빌드 및 실행
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/9.4.6
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
+# 빌드
+mvn clean install
+
+# 실행
+java -jar target/*.jar
 ```
 
 ## 관련 링크

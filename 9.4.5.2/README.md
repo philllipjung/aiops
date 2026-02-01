@@ -1,34 +1,30 @@
-# Faro Web SDK
+# Gradle Java Project
 
 ## 버전
 **v9.4.5.2**
 
 ## 개요
 
-Faro Web SDK v9.4.5.2는 AI-powered insights와 고급 모니터링 기능을 포함합니다.
+Gradle 기반 Java 프로젝트입니다.
 
-## v9.4.5.2 변경사항
+## 프로젝트 구조
 
-- AI 기반 이상 탐지 개선
-- Session replay 안정화
-- 버그 수정
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@9.4.5.2
+```
+9.4.5.2/
+├── build.gradle     # Gradle 빌드 스크립트
+└── src/             # 소스 코드
 ```
 
-## 사용
+## 빌드
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/9.4.5.2
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-  ai: { enableAnomalyDetection: true },
-});
+# 빌드
+./gradlew build
+
+# Clean
+./gradlew clean
 ```
 
 ## 관련 링크

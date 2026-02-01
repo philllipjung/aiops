@@ -1,33 +1,31 @@
-# Faro Web SDK
+# Maven Java Project
 
 ## 버전
 **v9.4.5.3**
 
 ## 개요
 
-Faro Web SDK v9.4.5.3은 패치 버전으로 성능 개선과 버그 수정이 포함되어 있습니다.
+Maven 기반 Java 프로젝트입니다.
 
-## v9.4.5.3 변경사항
+## 프로젝트 구조
 
-- 성능 최적화
-- 메모리 사용량 개선
-- 타입 정의 수정
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@9.4.5.3
+```
+9.4.5.3/
+├── pom.xml          # Maven 설정
+├── mvnw             # Maven Wrapper
+└── src/             # 소스 코드
 ```
 
-## 사용
+## 빌드 및 실행
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/9.4.5.3
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-});
+# 빌드
+./mvnw clean install
+
+# 실행
+java -jar target/*.jar
 ```
 
 ## 관련 링크

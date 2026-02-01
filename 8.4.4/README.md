@@ -1,35 +1,34 @@
-# Faro Web SDK
+# Java Instrumentation Workshop
 
 ## 버전
 **v8.4.4**
 
 ## 개요
 
-Faro Web SDK v8.4.4는 Grafana Cloud 통합과 개선된 observability 기능을 제공합니다.
+Java 계측(Instrumentation) 워크샵 프로젝트입니다.
 
-## v8.4.4 변경사항
+## 프로젝트 구조
 
-- Grafana Cloud 통합 개선
-- Smart Sampling 최적화
-- Privacy controls 강화
-
-## 설치
-
-```bash
-npm install @grafana/faro-web-sdk@8.4.4
+```
+8.4.4/
+├── docker-compose.yaml         # Docker Compose
+├── assets/                     # 리소스
+├── instrumented/              # 계측된 버전
+├── uninstrumented/            # 미계측 버전
+├── workshop.md                 # 워크샵 가이드
+└── yaml/                       # YAML 설정
 ```
 
-## 사용
+## 실행
 
-```typescript
-import { Faro } from '@grafana/faro-web-sdk';
+```bash
+cd /root/aiops/8.4.4
 
-const faro = Faro.init({
-  url: 'http://localhost:12345/collect',
-  app: { name: 'my-app', version: '1.0.0' },
-  sampling: { errorSamplingRate: 1.0 },
-  privacy: { maskSensitiveData: true },
-});
+# 계측된 버전 실행
+docker-compose -f docker-compose.yaml up instrumented
+
+# 미계측 버전 실행
+docker-compose -f docker-compose.yaml up uninstrumented
 ```
 
 ## 관련 링크
