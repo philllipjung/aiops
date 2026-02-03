@@ -1,3 +1,8 @@
+교보문고	https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=9791124205174
+도서11번가	https://www.11st.co.kr/products/9075271629
+알라딘	https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=9791124205174
+예스이십사	https://www.yes24.com/product/goods/176919469
+
 # AIOps 저장소
 
 ## 개요 (Overview)
