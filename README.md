@@ -1,10 +1,13 @@
 # AIOps 저장소
 
-아래에서 도서를 구입 하실 수 있습니다.
-## 교보문고	https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=9791124205174
-## 도서11번가	https://www.11st.co.kr/products/9075271629
-## 알라딘	https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=9791124205174
-## 예스이십사	https://www.yes24.com/product/goods/176919469
+### 도서 구입 정보
+
+| 판매처 | URL |
+|------|------|
+| **교보문고** | https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=9791124205174 |
+| **도서11번가** | https://www.11st.co.kr/products/9075271629 |
+| **알라딘** | https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=9791124205174 |
+| **예스이십사** | https://www.yes24.com/product/goods/176919469 |
 
 ## 개요 (Overview)
 
