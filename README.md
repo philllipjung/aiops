@@ -1,5 +1,11 @@
 # AIOps 저장소
 
+아래에서 도서를 구입 하실 수 있습니다.
+## 교보문고	https://www.kyobobook.co.kr/product/detailViewKor.laf?barcode=9791124205174
+## 도서11번가	https://www.11st.co.kr/products/9075271629
+## 알라딘	https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=9791124205174
+## 예스이십사	https://www.yes24.com/product/goods/176919469
+
 ## 개요 (Overview)
 
 이 저장소는 **AIOps(인공지능 운영)** 관련 다양한 프로젝트와 예제 코드를 포함한 컬렉션입니다. 모니터링, 로그 수집, 분산 추적, 메시징, 컨테이너 오케스트레이션 등 다양한 DevOps 및 AIOps 기술을 다룹니다.
